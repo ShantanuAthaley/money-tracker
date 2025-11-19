@@ -1,0 +1,21 @@
+networks:
+  db-network:
+    driver: bridge
+    name: db-network
+    attachable: true
+    external: {}
+services:
+  postgres:
+    hostname: 'postgres.docker'
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=money-tracker'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5433:5432'
+    networks:
+      - db-network
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+

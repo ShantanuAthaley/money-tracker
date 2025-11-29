@@ -1,16 +1,20 @@
 package dev.shantanu.money.tracker;
 
-import dev.shantanu.money.tracker.events.AccountStatementUploadedEvent;
+import dev.shantanu.money.tracker.statement.StatementEventPublisher;
+import dev.shantanu.money.tracker.statement.models.StatementProcessResponse;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -25,31 +29,37 @@ public class MoneyTrackerApplication {
 
 @RestController
 @RequestMapping("/api/statements")
+@EnableAsync
 class AccountStatementController {
-
-  private final ApplicationEventPublisher eventPublisher;
+  private static final Logger LOGGER = LoggerFactory.getLogger(AccountStatementController.class);
+  private final StatementEventPublisher eventPublisher;
   private final Path uploadDir = Paths.get("uploaded-statements"); // Define your path
 
-  public AccountStatementController(ApplicationEventPublisher eventPublisher) {
+  public AccountStatementController(StatementEventPublisher eventPublisher) {
     this.eventPublisher = eventPublisher;
     // Ensure the directory exists (best practice)
     try {
       if (!uploadDir.toFile().exists()) {
-        uploadDir.toFile().mkdirs();
+        boolean mkdirs = uploadDir.toFile().mkdirs();
+        if (mkdirs) {
+          LOGGER.info("Successfully created director for file upload. Directory = {} ", uploadDir.toFile().getName());
+        }
       }
     } catch (Exception e) {
       // Log error
-      throw new RuntimeException("Could not create upload directory", e);
+      LOGGER.error("Failed to create directory - {}", uploadDir.toFile().getName());
+      throw new RuntimeException("Could not create upload to directory", e);
     }
   }
 
   @PostMapping("/upload")
-  public String uploadStatement(
+  public DeferredResult<?> uploadStatement(
     @RequestParam("file") MultipartFile file,
     @RequestParam("password") String password) throws Exception {
 
     if (file.isEmpty()) {
-      return "Please select a file to upload";
+      var errorResult = new DeferredResult<>();
+      errorResult.setResult("No file present in the request, please select account statement file to upload");
     }
 
     // 1. Save the file to a specified folder
@@ -58,16 +68,10 @@ class AccountStatementController {
     file.transferTo(filePath);
 
     // 2. Generate and publish the ApplicationEvent
-    AccountStatementUploadedEvent event = new AccountStatementUploadedEvent(
-      this,           // source
-      file.getOriginalFilename(), // original file name for logging/reference
-      filePath,       // path to the saved file
-      password       // password provided by the user
-    );
-
+    DeferredResult<StatementProcessResponse> deferredResult = new DeferredResult<>();
     // This makes the event processing asynchronous, which is ideal for Modulith.
-    eventPublisher.publishEvent(event);
+    eventPublisher.publishStatementUploadEvent(this, uniqueFileName, filePath, null, deferredResult);
 
-    return "File uploaded successfully and processing initiated.";
+    return deferredResult;
   }
 }

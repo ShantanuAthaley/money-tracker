@@ -8,7 +8,7 @@ import dev.shantanu.bankstatement.parser.BankStatementParserFactory;
 import dev.shantanu.bankstatement.parser.model.TransactionInfo;
 import dev.shantanu.money.tracker.statement.AccountStatementPDFParser;
 import dev.shantanu.money.tracker.statement.events.AccountStatementUploadedEvent;
-import dev.shantanu.money.tracker.statement.models.StatementProcessResponse;
+import dev.shantanu.money.tracker.statement.StatementProcessResponse;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -34,7 +34,7 @@ class StatementProcessorService {
 
   @EventListener
   @Async
-  void handleStatementUpload(AccountStatementUploadedEvent statementUploadedEvent) {
+  void handleStatementUpload(AccountStatementUploadedEvent statementUploadedEvent) throws IOException {
 
     LOGGER.info("Processing statement for file: {}", statementUploadedEvent.getOriginalFileName());
     File file = statementUploadedEvent.getFilePath().toFile();

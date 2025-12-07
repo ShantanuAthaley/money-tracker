@@ -1,4 +1,4 @@
-package dev.shantanu.money.tracker.statement.models;
+package dev.shantanu.money.tracker.statement;
 
 import java.time.LocalDate;
 

@@ -1,6 +1,6 @@
 package dev.shantanu.money.tracker.statement.events;
 
-import dev.shantanu.money.tracker.statement.models.StatementProcessResponse;
+import dev.shantanu.money.tracker.statement.StatementProcessResponse;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.concurrent.atomic.AtomicReference;

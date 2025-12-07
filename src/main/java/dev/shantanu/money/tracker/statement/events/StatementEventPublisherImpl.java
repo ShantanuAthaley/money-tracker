@@ -1,7 +1,7 @@
 package dev.shantanu.money.tracker.statement.events;
 
 import dev.shantanu.money.tracker.statement.StatementEventPublisher;
-import dev.shantanu.money.tracker.statement.models.StatementProcessResponse;
+import dev.shantanu.money.tracker.statement.StatementProcessResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;

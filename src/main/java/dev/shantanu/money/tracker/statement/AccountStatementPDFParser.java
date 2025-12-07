@@ -1,6 +1,5 @@
 package dev.shantanu.money.tracker.statement;
 
-import dev.shantanu.money.tracker.statement.models.AccountTransactionDetails;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccountStatementPDFParser {
 
-  public AccountTransactionDetails getTransactionDetails(Path path, String securityPassword) throws IOException {
+  public StatementTransactionDetail getTransactionDetails(Path path, String securityPassword) throws IOException {
     List<Document> documents = getDecryptedPdfDocuments(path, securityPassword);
 
     // TODO: Replace this with your actual logic to extract structured data
@@ -44,7 +43,7 @@ public class AccountStatementPDFParser {
     // This often involves regex, custom parsers, or even another LLM call if the format varies.
 
     // Example placeholder result:
-    return new AccountTransactionDetails("1234567890", // Placeholder account number (must be extracted from 'allText')
+    return new StatementTransactionDetail("1234567890", // Placeholder account number (must be extracted from 'allText')
       List.of() // The actual list of transactions
     );
   }

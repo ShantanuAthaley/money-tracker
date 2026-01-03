@@ -14,32 +14,28 @@ import java.util.Set;
 @Service
 class HouseholdServiceImpl implements HouseholdService {
 
-    private final HouseholdCreateHandler createHandler;
-    private final HouseholdAddMembersHandler addMembersHandler;
     private final HouseholdQueryHandler queryHandler;
+    private final HouseholdCommandHandler commandHandler;
 
-    public HouseholdServiceImpl(HouseholdCreateHandler createHandler,
-                         HouseholdAddMembersHandler addMembersHandler,
-                         HouseholdQueryHandler queryHandler) {
-        this.createHandler = createHandler;
-        this.addMembersHandler = addMembersHandler;
+    public HouseholdServiceImpl(
+            HouseholdQueryHandler queryHandler, HouseholdCommandHandler commandHandler) {
         this.queryHandler = queryHandler;
+        this.commandHandler = commandHandler;
     }
 
     @Override
     public HouseholdCreatedResult createHouseHold(Create createCommand) {
-        return createHandler.handle(createCommand);
+        return commandHandler.handleCreate(createCommand);
     }
 
     @Override
     public Optional<HouseholdCreatedResult> addMembers(AddMembers addMembersCommand) {
-        return addMembersHandler.handle(addMembersCommand);
+        return commandHandler.handleAddMember(addMembersCommand);
     }
 
     @Override
     public Set<Ids.PersonId> getAllPersonIds(HouseholdQueries.GetMembers getMembersQuery) {
         return queryHandler.getMembers(getMembersQuery);
     }
-
 
 }

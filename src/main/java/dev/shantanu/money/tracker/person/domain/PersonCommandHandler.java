@@ -1,6 +1,7 @@
 package dev.shantanu.money.tracker.person.domain;
 
 import dev.shantanu.money.tracker.common.Ids;
+import dev.shantanu.money.tracker.common.Ids.HouseholdId;
 import dev.shantanu.money.tracker.common.PersonDraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ public class PersonCommandHandler {
         this.personRepository = personRepository;
     }
 
-    public Set<Ids.PersonId> createPersonForHousehold(Ids.HouseholdId householdId, Set<PersonDraft> personDraftSet) {
+    public Set<Ids.PersonId> createPersonForHousehold(HouseholdId householdId, Set<PersonDraft> personDraftSet) {
         Objects.requireNonNull(householdId, "householdId must not be null");
         Objects.requireNonNull(personDraftSet, "personDraftSet must not be null");
 

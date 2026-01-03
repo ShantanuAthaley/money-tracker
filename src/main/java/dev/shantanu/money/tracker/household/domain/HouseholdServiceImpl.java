@@ -2,9 +2,9 @@ package dev.shantanu.money.tracker.household.domain;
 
 import dev.shantanu.money.tracker.common.Ids;
 import dev.shantanu.money.tracker.household.HouseholdService;
+import dev.shantanu.money.tracker.household.contract.HouseholdCommands;
 import dev.shantanu.money.tracker.household.contract.HouseholdCommands.AddMembers;
 import dev.shantanu.money.tracker.household.contract.HouseholdCommands.Create;
-import dev.shantanu.money.tracker.household.contract.HouseholdCreatedResult;
 import dev.shantanu.money.tracker.household.contract.HouseholdQueries;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +24,12 @@ class HouseholdServiceImpl implements HouseholdService {
     }
 
     @Override
-    public HouseholdCreatedResult createHouseHold(Create createCommand) {
+    public HouseholdCommands.HouseholdCreatedResult createHouseHold(Create createCommand) {
         return commandHandler.handleCreate(createCommand);
     }
 
     @Override
-    public Optional<HouseholdCreatedResult> addMembers(AddMembers addMembersCommand) {
+    public Optional<HouseholdCommands.HouseholdCreatedResult> addMembers(AddMembers addMembersCommand) {
         return commandHandler.handleAddMember(addMembersCommand);
     }
 

@@ -15,7 +15,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Table(name = "account", schema = "money_tracker")
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
+
+@Table(name = "account", schema = SCHEMA_NAME)
 class Account extends AbstractAggregateRoot<Account> implements Persistable<Long> {
     @Id
     private final Long accountId;

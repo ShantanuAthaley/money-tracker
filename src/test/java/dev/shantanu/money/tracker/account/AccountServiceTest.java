@@ -1,6 +1,7 @@
 package dev.shantanu.money.tracker.account;
 
 import com.zaxxer.hikari.HikariDataSource;
+import dev.shantanu.money.tracker.TestcontainersConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -14,76 +15,58 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
-@Testcontainers
 @ActiveProfiles("test")
+@Import(TestcontainersConfiguration.class)
 class AccountServiceTest implements ApplicationContextAware {
-    public static final String PERSON_ACCOUNT_TABLE = "person_account";
-    private static ApplicationContext context;
-    private static final String SCHEMA_NAME = "money_tracker";
     private static final String PERSON_TABLE_NAME = "person";
-    private final long householdId = 100001L;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        AccountServiceTest.context = applicationContext;
-    }
+    public static final String PERSON_ACCOUNT_TABLE = "person_account";
+    private static final long HOUSEHOLD_ID = 100001L;
 
     @Autowired
+    private static ApplicationContext context;
+    @Autowired
     private AccountService accountService;
-
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("personal_finance")
-            .withUsername("postgres")
-            .withPassword("postgres");
 
 
-    @DynamicPropertySource
-    static void props(DynamicPropertyRegistry r) {
-        r.add("spring.datasource.url", postgres::getJdbcUrl);
-        r.add("spring.datasource.username", postgres::getUsername);
-        r.add("spring.datasource.password", postgres::getPassword);
-
-        r.add("spring.flyway.enabled", () -> "true");
-        r.add("spring.flyway.url", postgres::getJdbcUrl);
-        r.add("spring.flyway.user", postgres::getUsername);
-        r.add("spring.flyway.password", postgres::getPassword);
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        assertNotNull(context);
+        AccountServiceTest.context = applicationContext;
     }
 
     @AfterAll
     static void afterAll() {
         DataSource dataSource = context.getBean(DataSource.class);
+        PostgreSQLContainer<?> postgreSQLContainer = context.getBean(PostgreSQLContainer.class);
         if (dataSource instanceof HikariDataSource) {
             ((HikariDataSource) dataSource).close();
         }
-        postgres.stop();
+        postgreSQLContainer.stop();
     }
 
     @BeforeEach
     void beforeEach() {
         //insert householdId
-        jdbcTemplate.update("INSERT INTO " + SCHEMA_NAME + "." + "household" + "(household_id, name) VALUES (?, ?)", householdId, "household name - " + householdId);
+        jdbcTemplate.update("INSERT INTO " + SCHEMA_NAME + "." + "household" + "(household_id, name) VALUES (?, ?)", HOUSEHOLD_ID, "household name - " + HOUSEHOLD_ID);
     }
 
     @AfterEach
@@ -121,7 +104,7 @@ class AccountServiceTest implements ApplicationContextAware {
 
         //insert person id into person table
         final var insertQuery = "INSERT INTO " + SCHEMA_NAME + "." + PERSON_TABLE_NAME + " (person_id, household_id, name) VALUES (?, ?, ?)";
-        personIds.forEach(idOfPerson -> jdbcTemplate.update(insertQuery, idOfPerson, householdId, "Person name of " + idOfPerson));
+        personIds.forEach(idOfPerson -> jdbcTemplate.update(insertQuery, idOfPerson, HOUSEHOLD_ID, "Person name of " + idOfPerson));
 
         Long accountCreated = accountService.createAccount(command);
         assertNotNull(accountCreated);

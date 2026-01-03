@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
 import static dev.shantanu.money.tracker.common.Ids.AccountId;
 
-@Table("statement_import")
+@Table(value = "statement_import", schema = SCHEMA_NAME)
 class StatementImport {
     @Id
     private final Long statementImportId;
@@ -25,6 +26,7 @@ class StatementImport {
     private final List<String> parsingErrors;
     private final String importStatus;
 
+    // Domain constructor
     StatementImport(Long statementImportId, LocalDateTime importDate, String statementFile,
                     AccountId accountId, AccountType accountType,
                     Double openingBalance, Double closingBalance,
@@ -53,6 +55,10 @@ class StatementImport {
         this.closingBalance = closingBalance;
         this.parsingErrors = parsingErrors;
         this.importStatus = importStatus;
+    }
+
+    public String getImportStatus() {
+        return importStatus;
     }
 
     @Override

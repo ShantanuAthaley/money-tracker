@@ -6,7 +6,9 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
 
-@Table(value = "person_account", schema = "money_tracker")
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
+
+@Table(value = "person_account", schema = SCHEMA_NAME)
 public class AccountOwnership {
     @Column("person_id")
     private Long personId;

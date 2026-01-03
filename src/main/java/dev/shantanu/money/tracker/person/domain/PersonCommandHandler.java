@@ -25,11 +25,11 @@ public class PersonCommandHandler {
     public Set<Ids.PersonId> createPersonForHousehold(HouseholdId householdId, Set<PersonDraft> personDraftSet) {
         Objects.requireNonNull(householdId, "householdId must not be null");
         Objects.requireNonNull(personDraftSet, "personDraftSet must not be null");
-
         Set<Person> personToSave = personDraftSet.stream()
                 .map(personDraft -> Person.buildFrom(householdId, personDraft))
                 .collect(Collectors.toSet());
         List<Person> people = personRepository.saveAll(personToSave);
+        LOGGER.debug("Created {} people", people.size());
         return people.stream()
                 .map(Person::id)
                 .map(Ids.PersonId::new)

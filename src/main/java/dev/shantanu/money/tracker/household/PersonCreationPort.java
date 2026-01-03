@@ -8,8 +8,6 @@ import java.util.Set;
 
 public interface PersonCreationPort {
     Set<Ids.PersonId> addMembers(Ids.HouseholdId householdId, Set<PersonDraft> personDraft);
-
     Set<Ids.PersonId> getMemberIds(Ids.HouseholdId householdId);
-
     Set<PersonResult> getMembers(Ids.HouseholdId householdId);
 }

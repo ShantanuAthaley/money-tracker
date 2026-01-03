@@ -13,7 +13,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Table(schema = "money_tracker", name = "person")
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
+
+@Table(schema = SCHEMA_NAME, name = "person")
 class Person extends AbstractAggregateRoot<Person> {
     @Id
     private final Long personId;

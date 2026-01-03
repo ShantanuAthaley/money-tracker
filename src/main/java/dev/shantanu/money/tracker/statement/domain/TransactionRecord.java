@@ -16,9 +16,11 @@ import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Table("transaction_record")
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
+
+@Table(value = "transaction_record", schema = SCHEMA_NAME)
 class TransactionRecord {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Transaction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionRecord.class);
     @Id
     private TransactionId id;
 
@@ -35,7 +37,9 @@ class TransactionRecord {
     @Column("dedupe_key_hash")
     private final String transactionHash;
 
-    public TransactionRecord(TransactionId id, AggregateReference<AccountId, AccountId> accountId, LocalDate transactionDate, LocalDate valueDate, String description, String category, BigDecimal withdrawal, BigDecimal deposit, BigDecimal balance, String transactionHash) {
+    public TransactionRecord(TransactionId id, AggregateReference<AccountId, AccountId> accountId,
+                             LocalDate transactionDate, LocalDate valueDate, String description,
+                             String category, BigDecimal withdrawal, BigDecimal deposit, BigDecimal balance) {
         this.id = id;
         this.accountId = accountId;
         this.transactionDate = transactionDate;
@@ -45,17 +49,17 @@ class TransactionRecord {
         this.withdrawal = withdrawal;
         this.deposit = deposit;
         this.balance = balance;
-        this.transactionHash = computeTransactionHash(accountId.getId(), transactionDate, withdrawal, deposit, balance);
+        this.transactionHash = computeTransactionHash(transactionDate, withdrawal, deposit, balance);
     }
 
-    private String computeTransactionHash(AccountId id, LocalDate transactionDate, BigDecimal withdrawal, BigDecimal deposit, BigDecimal balance) {
+    private String computeTransactionHash(LocalDate transactionDate, BigDecimal withdrawal, BigDecimal deposit, BigDecimal balance) {
         try {
             final String inputStr = accountId + "|" + transactionDate + "|" + withdrawal + "|" + deposit + "|" + balance;
             MessageDigest instance = MessageDigest.getInstance(DigestMethod.SHA3_256);
             byte[] digest = instance.digest(inputStr.getBytes());
             return new String(digest, Charset.defaultCharset());
         } catch (Exception e) {
-            LOGGER.error("Error calculating transactionHash - search key.");
+            LOGGER.error("Error calculating transactionHash - search key.", e);
         }
         return null;
     }

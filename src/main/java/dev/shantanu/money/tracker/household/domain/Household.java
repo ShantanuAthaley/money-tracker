@@ -7,7 +7,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-@Table(schema = "money_tracker", name = "household")
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
+
+@Table(schema = SCHEMA_NAME, name = "household")
 class Household {
     @Id
     private final Long householdId;

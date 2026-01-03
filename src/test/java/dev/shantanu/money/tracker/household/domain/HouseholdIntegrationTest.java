@@ -1,27 +1,23 @@
 package dev.shantanu.money.tracker.household.domain;
 
 import com.zaxxer.hikari.HikariDataSource;
+import dev.shantanu.money.tracker.TestcontainersConfiguration;
 import dev.shantanu.money.tracker.common.Ids;
 import dev.shantanu.money.tracker.common.PersonDraft;
 import dev.shantanu.money.tracker.household.HouseholdService;
 import dev.shantanu.money.tracker.household.contract.HouseholdCommands;
-import dev.shantanu.money.tracker.household.contract.HouseholdCreatedResult;
 import dev.shantanu.money.tracker.household.contract.HouseholdQueries;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
@@ -30,42 +26,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-@Testcontainers
 @ActiveProfiles("test")
-class HouseholdIntegrationTest implements ApplicationContextAware {
-
+@Import(TestcontainersConfiguration.class)
+class HouseholdTest implements ApplicationContextAware {
     private static final String HOUSEHOLD = "household";
-    private static final String SCHEMA_NAME = "money_tracker";
     private static final String PERSON_TABLE = "person";
     private static ApplicationContext context;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        context = applicationContext;
-    }
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("personal_finance")
-            .withUsername("postgres")
-            .withPassword("postgres");
-
-
-    @DynamicPropertySource
-    static void props(DynamicPropertyRegistry r) {
-        r.add("spring.datasource.url", postgres::getJdbcUrl);
-        r.add("spring.datasource.username", postgres::getUsername);
-        r.add("spring.datasource.password", postgres::getPassword);
-
-        r.add("spring.flyway.enabled", () -> "true");
-        r.add("spring.flyway.url", postgres::getJdbcUrl);
-        r.add("spring.flyway.user", postgres::getUsername);
-        r.add("spring.flyway.password", postgres::getPassword);
-    }
 
     @Autowired
     private HouseholdService householdService;
@@ -75,9 +47,10 @@ class HouseholdIntegrationTest implements ApplicationContextAware {
     private JdbcTemplate jdbcTemplate;
 
 
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
+    @Override
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) {
+        assertNotNull(applicationContext, "context is null");
+        context = applicationContext;
     }
 
     @AfterAll
@@ -86,7 +59,7 @@ class HouseholdIntegrationTest implements ApplicationContextAware {
         if (dataSource instanceof HikariDataSource) {
             ((HikariDataSource) dataSource).close();
         }
-        postgres.stop();
+        context.getBean(PostgreSQLContainer.class).stop();
     }
 
     @Test
@@ -95,7 +68,7 @@ class HouseholdIntegrationTest implements ApplicationContextAware {
         final String familyName = "Athaley";
         HouseholdCommands.Create athaleys = buildAthaleysCreateFamilyCommand(familyName);
         // When
-        HouseholdCreatedResult houseHold = householdService.createHouseHold(athaleys);
+        HouseholdCommands.HouseholdCreatedResult houseHold = householdService.createHouseHold(athaleys);
 
         record HouseholdCreatedResult(Long householdId, String name) {
         }
@@ -149,7 +122,7 @@ class HouseholdIntegrationTest implements ApplicationContextAware {
         HouseholdCommands.AddMembers addMembers = new HouseholdCommands.AddMembers(household.getHouseholdId(), Set.of(personDraft));
 
         // When
-        Optional<HouseholdCreatedResult> householdCreatedResult = householdService.addMembers(addMembers);
+        Optional<HouseholdCommands.HouseholdCreatedResult> householdCreatedResult = householdService.addMembers(addMembers);
 
         // Then
         var updatedWithMember = householdRepository.findById(household.getHouseholdId().id());

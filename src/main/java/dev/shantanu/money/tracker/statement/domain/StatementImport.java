@@ -1,8 +1,8 @@
-package dev.shantanu.money.tracker.statement;
+package dev.shantanu.money.tracker.statement.domain;
 
 import dev.shantanu.money.tracker.account.AccountType;
-import dev.shantanu.money.tracker.common.Ids.Money;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -11,29 +11,48 @@ import java.util.List;
 import java.util.Objects;
 
 import static dev.shantanu.money.tracker.common.Ids.AccountId;
-import static dev.shantanu.money.tracker.common.Ids.StatementImportId;
 
-@Table("ingress_statement")
+@Table("statement_import")
 class StatementImport {
     @Id
-    private final StatementImportId statementImportId;
+    private final Long statementImportId;
     private final LocalDateTime importDate;
     private final String statementFile;
-    private final AggregateReference<AccountId, AccountId> accountId;
+    private final AggregateReference<AccountId, Long> accountId;
     private final AccountType accountType;
-    private final Money openingBalance;
-    private final Money closingBalance;
+    private final Double openingBalance;
+    private final Double closingBalance;
     private final List<String> parsingErrors;
+    private final String importStatus;
 
-    StatementImport(StatementImportId statementImportId, LocalDateTime importDate, String statementFile, AggregateReference<AccountId, AccountId> accountId, AccountType accountType, Money openingBalance, Money closingBalance, List<String> parsingErrors) {
+    StatementImport(Long statementImportId, LocalDateTime importDate, String statementFile,
+                    AccountId accountId, AccountType accountType,
+                    Double openingBalance, Double closingBalance,
+                    List<String> parsingErrors) {
         this.statementImportId = statementImportId;
         this.importDate = importDate;
         this.statementFile = statementFile;
-        this.accountId = accountId;
+        this.accountId = AggregateReference.to(accountId.id()); //It is expected to receive input as AccountId
         this.accountType = accountType;
         this.openingBalance = openingBalance;
         this.closingBalance = closingBalance;
         this.parsingErrors = parsingErrors;
+        this.importStatus = !parsingErrors.isEmpty() ? "PARSED" : "NEEDS_REVIEW";
+    }
+
+    @PersistenceCreator
+    StatementImport(Long statementImportId, LocalDateTime importDate, String statementFile,
+                    Long accountId, AccountType accountType,
+                    Double openingBalance, Double closingBalance, List<String> parsingErrors, String importStatus) {
+        this. statementImportId = statementImportId;
+        this.importDate = importDate;
+        this.statementFile = statementFile;
+        this.accountId = AggregateReference.to(accountId);
+        this.accountType = accountType;
+        this.openingBalance = openingBalance;
+        this.closingBalance = closingBalance;
+        this.parsingErrors = parsingErrors;
+        this.importStatus = importStatus;
     }
 
     @Override

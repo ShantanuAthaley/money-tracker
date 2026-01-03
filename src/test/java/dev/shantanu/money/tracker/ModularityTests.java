@@ -24,13 +24,11 @@ class ModularityTests {
     }
 
     @Test
-    void renderDocumentation() throws Exception {
+    void renderDocumentation() {
 
         var canvasOptions = CanvasOptions.defaults()
-
                 // --> Optionally enable linking of JavaDoc
                 // .withApiBase("https://foobar.something")
-
                 ;
 
         var docOptions = DiagramOptions.defaults()
@@ -38,5 +36,20 @@ class ModularityTests {
 
         new Documenter(modules) //
                 .writeDocumentation(docOptions, canvasOptions);
+    }
+
+    @Test
+    void writeDocumentationAsPlantUml() {
+
+        new Documenter(modules)
+                .writeModulesAsPlantUml()
+                .writeIndividualModulesAsPlantUml();
+    }
+
+    @Test
+    void writeDocumentationSnippets() {
+
+        new Documenter(modules)
+                .writeAggregatingDocument();
     }
 }

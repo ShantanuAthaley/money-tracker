@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Table(schema = "money_tracker", name = "household")
-public class Household {
+class Household {
     @Id
     private final Long householdId;
     private final String name;

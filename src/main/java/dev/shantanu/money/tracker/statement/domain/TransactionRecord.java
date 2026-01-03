@@ -1,4 +1,4 @@
-package dev.shantanu.money.tracker.statement;
+package dev.shantanu.money.tracker.statement.domain;
 
 import dev.shantanu.money.tracker.common.Ids.AccountId;
 import dev.shantanu.money.tracker.common.Ids.TransactionId;
@@ -18,7 +18,7 @@ import java.util.Objects;
 
 @Table("transaction_record")
 class TransactionRecord {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionRecord.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Transaction.class);
     @Id
     private TransactionId id;
 
@@ -61,11 +61,21 @@ class TransactionRecord {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
 
-        TransactionRecord that = (TransactionRecord) object;
-        return Objects.equals(id, that.id) && Objects.equals(accountId, that.accountId) && Objects.equals(transactionDate, that.transactionDate) && Objects.equals(valueDate, that.valueDate) && Objects.equals(description, that.description) && Objects.equals(category, that.category) && Objects.equals(withdrawal, that.withdrawal) && Objects.equals(deposit, that.deposit) && Objects.equals(balance, that.balance) && Objects.equals(transactionHash, that.transactionHash);
+        TransactionRecord that = (TransactionRecord) o;
+        return Objects.equals(id, that.id)
+                && Objects.equals(accountId, that.accountId)
+                && Objects.equals(transactionDate, that.transactionDate)
+                && Objects.equals(valueDate, that.valueDate)
+                && Objects.equals(description, that.description)
+                && Objects.equals(category, that.category)
+                && Objects.equals(withdrawal, that.withdrawal)
+                && Objects.equals(deposit, that.deposit)
+                && Objects.equals(balance, that.balance)
+                && Objects.equals(transactionHash, that.transactionHash);
+
     }
 
     @Override

@@ -1,4 +1,4 @@
-package dev.shantanu.money.tracker.statement;
+package dev.shantanu.money.tracker.statement.domain;
 
 import dev.shantanu.bankstatement.common.TransactionRecord;
 import dev.shantanu.money.tracker.common.Ids;

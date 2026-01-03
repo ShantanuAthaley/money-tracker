@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS money_tracker.person (
 -- TABLE: account
 -- =========================
 CREATE TABLE IF NOT EXISTS money_tracker.account (
-    account_id         BIGSERIAL PRIMARY KEY,
+    account_id         BIGINT PRIMARY KEY,
     account_type       VARCHAR(50) NOT NULL,
     account_holder     TEXT,
     bank_name          VARCHAR(56),
@@ -57,9 +57,9 @@ CREATE TABLE IF NOT EXISTS money_tracker.person_account (
 
 
 -- =========================
--- TABLE: ingress_statement
+-- TABLE: statement_import
 -- =========================
-CREATE TABLE IF NOT EXISTS money_tracker.ingress_statement (
+CREATE TABLE IF NOT EXISTS money_tracker.statement_import (
     id                      BIGSERIAL PRIMARY KEY,
     import_date             TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     statement_file          TEXT NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS money_tracker.ingress_statement (
 -- =========================
 CREATE TABLE IF NOT EXISTS money_tracker.transaction_staging (
     staging_id              BIGSERIAL PRIMARY KEY,
-    ingress_id              BIGINT NOT NULL REFERENCES money_tracker.ingress_statement(id),
+    ingress_id              BIGINT NOT NULL REFERENCES money_tracker.statement_import(id),
     account_id              BIGINT NOT NULL REFERENCES money_tracker.account(account_id),
 
     transaction_date        DATE NOT NULL,
@@ -126,17 +126,17 @@ CREATE TABLE IF NOT EXISTS money_tracker.transaction_record (
 -- Indexes
 -- =========================
 
-CREATE INDEX IF NOT EXISTS idx_ingress_account_id
-    ON money_tracker.ingress_statement(account_id);
+CREATE INDEX IF NOT EXISTS idx_import_account_id
+    ON money_tracker.statement_import(account_id);
 
-CREATE INDEX IF NOT EXISTS idx_ingress_import_date
-    ON money_tracker.ingress_statement(import_date);
+CREATE INDEX IF NOT EXISTS idx_import_import_date
+    ON money_tracker.statement_import(import_date);
 
-CREATE INDEX IF NOT EXISTS idx_ingress_statement_type
-    ON money_tracker.ingress_statement(statement_type);
+CREATE INDEX IF NOT EXISTS idx_statement_import_type
+    ON money_tracker.statement_import(statement_type);
 
-CREATE INDEX IF NOT EXISTS idx_ingress_txn_range
-    ON money_tracker.ingress_statement(transaction_date_from, transaction_date_to);
+CREATE INDEX IF NOT EXISTS idx_import_txn_range
+    ON money_tracker.statement_import(transaction_date_from, transaction_date_to);
 
 -- staging index (corrected column name)
 CREATE INDEX IF NOT EXISTS idx_staging_account_date
@@ -160,7 +160,7 @@ ALTER TABLE money_tracker.account
 ALTER TABLE money_tracker.account
     ADD CONSTRAINT chk_account_type_nonempty CHECK (account_type <> '');
 
-ALTER TABLE money_tracker.ingress_statement
+ALTER TABLE money_tracker.statement_import
     ADD CONSTRAINT chk_transaction_date_range
         CHECK (
             transaction_date_from IS NULL OR
@@ -168,8 +168,8 @@ ALTER TABLE money_tracker.ingress_statement
             transaction_date_from <= transaction_date_to
         );
 
-ALTER TABLE money_tracker.ingress_statement
+ALTER TABLE money_tracker.statement_import
     ADD CONSTRAINT chk_opening_balance_non_negative CHECK (opening_balance IS NULL OR opening_balance >= 0);
 
-ALTER TABLE money_tracker.ingress_statement
+ALTER TABLE money_tracker.statement_import
     ADD CONSTRAINT chk_closing_balance_non_negative CHECK (closing_balance IS NULL OR closing_balance >= 0);

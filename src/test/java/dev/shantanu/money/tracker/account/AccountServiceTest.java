@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ActiveProfiles;
@@ -136,7 +135,7 @@ class AccountServiceTest implements ApplicationContextAware {
                         && owningPercentages.containsAll(savedOwningPerc),
                 "The saved owning percentages should match the input owning percentages from AccountOwnership"
         );
-        Assertions.assertEquals(accountId, savedAccount.stream().findFirst().get());
+        Assertions.assertEquals(accountId, savedAccount.stream().findFirst().orElseThrow());
 
 
     }

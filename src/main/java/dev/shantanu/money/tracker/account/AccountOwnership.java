@@ -1,6 +1,5 @@
 package dev.shantanu.money.tracker.account;
 
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 

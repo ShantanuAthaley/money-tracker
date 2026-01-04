@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -93,8 +92,10 @@ class HouseholdServiceTest implements ApplicationContextAware {
         var household = householdResult.stream().findFirst().orElseThrow(AssertionError::new);
         assertAll(
                 "household created result",
-                () -> assertThat(household).isNotNull(),
-                () -> assertThat(household.name).isEqualTo(familyName),
+                () -> {
+                    assertNotNull(household);
+                    assertThat(household.name).isEqualTo(familyName);
+                },
                 () -> assertThat(personCreatedResults).hasSize(3));
 
         Set<Ids.PersonId> allPersonIds = householdService
@@ -122,7 +123,7 @@ class HouseholdServiceTest implements ApplicationContextAware {
     void shouldUpdateHouseholdMembers() {
         // Given
         Household household = householdRepository.save(Household.createWithName("Update Test"));
-        var personDraft = new PersonDraft("Test Member", "TEST00131F", "test@unit.fam", LocalDate.of(1980, Month.JANUARY, 01));
+        var personDraft = new PersonDraft("Test Member", "TEST00131F", "test@unit.fam", LocalDate.of(1980, Month.JANUARY, 1));
         HouseholdCommands.AddMembers addMembers = new HouseholdCommands.AddMembers(household.getHouseholdId(), Set.of(personDraft));
 
         // When

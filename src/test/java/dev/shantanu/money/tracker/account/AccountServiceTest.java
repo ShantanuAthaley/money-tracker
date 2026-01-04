@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
@@ -29,43 +29,44 @@ import java.util.stream.Stream;
 import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
+@ContextConfiguration(classes = {
+        TestcontainersConfiguration.class,
+})
+
 class AccountServiceTest implements ApplicationContextAware {
     private static final String PERSON_TABLE_NAME = "person";
     public static final String PERSON_ACCOUNT_TABLE = "person_account";
     private static final long HOUSEHOLD_ID = 100001L;
+    private static ApplicationContext context;
 
     @Autowired
-    private static ApplicationContext context;
-    @Autowired
     private AccountService accountService;
+
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-
-
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        assertNotNull(context);
-        AccountServiceTest.context = applicationContext;
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) {
+        assertNotNull(applicationContext, "context should not be null");
+        context = applicationContext;
     }
 
     @AfterAll
     static void afterAll() {
         DataSource dataSource = context.getBean(DataSource.class);
-        PostgreSQLContainer<?> postgreSQLContainer = context.getBean(PostgreSQLContainer.class);
         if (dataSource instanceof HikariDataSource) {
             ((HikariDataSource) dataSource).close();
         }
-        postgreSQLContainer.stop();
+        context.getBean(PostgreSQLContainer.class).stop();
     }
 
     @BeforeEach
     void beforeEach() {
         //insert householdId
+        DataSource dataSource = context.getBean(DataSource.class);
+        assertNotNull(dataSource, "dataSource should not be null before using jdbcTemplate");
         jdbcTemplate.update("INSERT INTO " + SCHEMA_NAME + "." + "household" + "(household_id, name) VALUES (?, ?)", HOUSEHOLD_ID, "household name - " + HOUSEHOLD_ID);
     }
 

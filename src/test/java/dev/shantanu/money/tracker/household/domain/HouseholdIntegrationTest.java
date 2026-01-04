@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
@@ -33,8 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
-class HouseholdTest implements ApplicationContextAware {
+@ContextConfiguration(classes = {
+        TestcontainersConfiguration.class,
+})
+
+class HouseholdServiceTest implements ApplicationContextAware {
     private static final String HOUSEHOLD = "household";
     private static final String PERSON_TABLE = "person";
     private static ApplicationContext context;

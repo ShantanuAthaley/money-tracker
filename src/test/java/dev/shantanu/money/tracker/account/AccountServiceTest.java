@@ -1,9 +1,7 @@
 package dev.shantanu.money.tracker.account;
 
-import com.zaxxer.hikari.HikariDataSource;
 import dev.shantanu.money.tracker.TestcontainersConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-
-import javax.sql.DataSource;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,9 +31,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AccountServiceTest implements ApplicationContextAware {
     private static final String PERSON_TABLE_NAME = "person";
-    public static final String PERSON_ACCOUNT_TABLE = "person_account";
+    private static final String PERSON_ACCOUNT_TABLE = "person_account";
     private static final long HOUSEHOLD_ID = 100001L;
-    private static ApplicationContext context;
 
     @Autowired
     private AccountService accountService;
@@ -46,26 +40,16 @@ class AccountServiceTest implements ApplicationContextAware {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+
     @Override
     public void setApplicationContext(@NotNull ApplicationContext applicationContext) {
         assertNotNull(applicationContext, "context should not be null");
-        context = applicationContext;
     }
 
-    @AfterAll
-    static void afterAll() {
-        DataSource dataSource = context.getBean(DataSource.class);
-        if (dataSource instanceof HikariDataSource) {
-            ((HikariDataSource) dataSource).close();
-        }
-        context.getBean(PostgreSQLContainer.class).stop();
-    }
 
     @BeforeEach
     void beforeEach() {
         //insert householdId
-        DataSource dataSource = context.getBean(DataSource.class);
-        assertNotNull(dataSource, "dataSource should not be null before using jdbcTemplate");
         jdbcTemplate.update("INSERT INTO " + SCHEMA_NAME + "." + "household" + "(household_id, name) VALUES (?, ?)", HOUSEHOLD_ID, "household name - " + HOUSEHOLD_ID);
     }
 

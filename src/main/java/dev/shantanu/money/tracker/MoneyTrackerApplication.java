@@ -22,7 +22,7 @@ import java.util.UUID;
 @SpringBootApplication
 public class MoneyTrackerApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(MoneyTrackerApplication.class, args);
     }
 

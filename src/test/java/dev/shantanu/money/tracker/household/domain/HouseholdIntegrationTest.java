@@ -1,6 +1,5 @@
 package dev.shantanu.money.tracker.household.domain;
 
-import com.zaxxer.hikari.HikariDataSource;
 import dev.shantanu.money.tracker.TestcontainersConfiguration;
 import dev.shantanu.money.tracker.common.Ids;
 import dev.shantanu.money.tracker.common.PersonDraft;
@@ -8,7 +7,6 @@ import dev.shantanu.money.tracker.household.HouseholdService;
 import dev.shantanu.money.tracker.household.contract.HouseholdCommands;
 import dev.shantanu.money.tracker.household.contract.HouseholdQueries;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +15,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -56,14 +51,6 @@ class HouseholdServiceTest implements ApplicationContextAware {
         context = applicationContext;
     }
 
-    @AfterAll
-    static void afterAll() {
-        DataSource dataSource = context.getBean(DataSource.class);
-        if (dataSource instanceof HikariDataSource) {
-            ((HikariDataSource) dataSource).close();
-        }
-        context.getBean(PostgreSQLContainer.class).stop();
-    }
 
     @Test
     void shouldSaveAndRetrieveHousehold() {

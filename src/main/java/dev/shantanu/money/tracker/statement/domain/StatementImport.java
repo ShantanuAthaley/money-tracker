@@ -16,7 +16,7 @@ import static dev.shantanu.money.tracker.common.Ids.AccountId;
 @Table(value = "statement_import", schema = SCHEMA_NAME)
 class StatementImport {
     @Id
-    private final Long statementImportId;
+    private final Long id;
     private final LocalDateTime importDate;
     private final String statementFile;
     private final AggregateReference<AccountId, Long> accountId;
@@ -31,7 +31,7 @@ class StatementImport {
                     AccountId accountId, AccountType accountType,
                     Double openingBalance, Double closingBalance,
                     List<String> parsingErrors) {
-        this.statementImportId = statementImportId;
+        this.id = statementImportId;
         this.importDate = importDate;
         this.statementFile = statementFile;
         this.accountId = AggregateReference.to(accountId.id()); //It is expected to receive input as AccountId
@@ -46,7 +46,7 @@ class StatementImport {
     StatementImport(Long statementImportId, LocalDateTime importDate, String statementFile,
                     Long accountId, AccountType accountType,
                     Double openingBalance, Double closingBalance, List<String> parsingErrors, String importStatus) {
-        this. statementImportId = statementImportId;
+        this.id = statementImportId;
         this.importDate = importDate;
         this.statementFile = statementFile;
         this.accountId = AggregateReference.to(accountId);
@@ -57,6 +57,7 @@ class StatementImport {
         this.importStatus = importStatus;
     }
 
+
     public String getImportStatus() {
         return importStatus;
     }
@@ -66,12 +67,12 @@ class StatementImport {
         if (object == null || getClass() != object.getClass()) return false;
 
         StatementImport that = (StatementImport) object;
-        return Objects.equals(statementImportId, that.statementImportId) && Objects.equals(importDate, that.importDate) && Objects.equals(statementFile, that.statementFile) && Objects.equals(accountId, that.accountId) && accountType == that.accountType && Objects.equals(openingBalance, that.openingBalance) && Objects.equals(closingBalance, that.closingBalance) && Objects.equals(parsingErrors, that.parsingErrors);
+        return Objects.equals(id, that.id) && Objects.equals(importDate, that.importDate) && Objects.equals(statementFile, that.statementFile) && Objects.equals(accountId, that.accountId) && accountType == that.accountType && Objects.equals(openingBalance, that.openingBalance) && Objects.equals(closingBalance, that.closingBalance) && Objects.equals(parsingErrors, that.parsingErrors);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(statementImportId);
+        int result = Objects.hashCode(id);
         result = 31 * result + Objects.hashCode(importDate);
         result = 31 * result + Objects.hashCode(statementFile);
         result = 31 * result + Objects.hashCode(accountId);

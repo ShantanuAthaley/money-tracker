@@ -1,9 +1,10 @@
 package dev.shantanu.money.tracker.account;
 
+
 import dev.shantanu.money.tracker.common.Ids;
 
-import java.util.Set;
+import java.util.Map;
 
 public interface AccountOwnershipPort {
-    AccountOwnership createAccountOwnership(Ids.AccountId accountId, Set<AccountOwnership> accountOwners);
+    void createAccountOwnership(Ids.AccountId accountId, Map<Long, Double> accountOwners);
 }

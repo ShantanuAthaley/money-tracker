@@ -7,7 +7,7 @@ networks:
 services:
   postgres:
     hostname: 'postgres.docker'
-    image: 'postgres:latest'
+    image: 'postgres:17'
     environment:
       - 'POSTGRES_DB=money-tracker'
       - 'POSTGRES_PASSWORD=postgres'
@@ -17,5 +17,5 @@ services:
     networks:
       - db-network
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql
 

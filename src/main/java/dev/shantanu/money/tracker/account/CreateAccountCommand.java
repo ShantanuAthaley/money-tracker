@@ -1,8 +1,8 @@
 package dev.shantanu.money.tracker.account;
 
-import java.util.Set;
+import java.util.Map;
 
 public record CreateAccountCommand(AccountDetail accountDetail,
-                                   Set<AccountOwnership> accountOwners) {
+                                   Map<Long, Double> personOwnershipMap) {
 }
 

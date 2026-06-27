@@ -82,9 +82,7 @@ class AccountServiceTest implements ApplicationContextAware {
 
         assertEquals(personIds.size(), owningPercentages.size(), "Invalid Test: Number of ownership percentages should be equal to number of personIds from input");
 
-        Set<AccountOwnership> accountOwnerships = buildAccountOwnerships(personOwnershipMap);
-
-        CreateAccountCommand command = new CreateAccountCommand(new AccountDetail(accountId, accountType, bankName, taxId), accountOwnerships);
+        CreateAccountCommand command = new CreateAccountCommand(new AccountDetail(accountId, accountType, bankName, taxId), personOwnershipMap);
 
         //insert person id into person table
         final var insertQuery = "INSERT INTO " + SCHEMA_NAME + "." + PERSON_TABLE_NAME + " (person_id, household_id, name) VALUES (?, ?, ?)";
@@ -122,12 +120,5 @@ class AccountServiceTest implements ApplicationContextAware {
         Assertions.assertEquals(accountId, savedAccount.stream().findFirst().orElseThrow());
 
 
-    }
-
-    private static @NotNull Set<AccountOwnership> buildAccountOwnerships(Map<Long, Double> personOwnershipMap) {
-        return personOwnershipMap.entrySet()
-                .stream()
-                .map(entry -> new AccountOwnership(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toSet());
     }
 }

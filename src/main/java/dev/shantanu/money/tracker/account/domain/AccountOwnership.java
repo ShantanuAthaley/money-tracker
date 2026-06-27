@@ -1,4 +1,4 @@
-package dev.shantanu.money.tracker.account;
+package dev.shantanu.money.tracker.account.domain;
 
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -8,7 +8,7 @@ import java.util.Objects;
 import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
 
 @Table(value = "person_account", schema = SCHEMA_NAME)
-public class AccountOwnership {
+class AccountOwnership {
     @Column("person_id")
     private final Long personId;
     @Column("owning_percentage")

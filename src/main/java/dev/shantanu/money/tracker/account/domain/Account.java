@@ -1,6 +1,9 @@
 package dev.shantanu.money.tracker.account.domain;
 
-import dev.shantanu.money.tracker.account.*;
+import dev.shantanu.money.tracker.account.AccountDetail;
+import dev.shantanu.money.tracker.account.AccountResult;
+import dev.shantanu.money.tracker.account.AccountType;
+import dev.shantanu.money.tracker.account.CreateAccountCommand;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Transient;
@@ -11,8 +14,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.shantanu.money.tracker.common.AppConstants.SCHEMA_NAME;
@@ -144,10 +146,14 @@ class Account extends AbstractAggregateRoot<Account> implements Persistable<Long
 
     static Account fromCreateCommand(CreateAccountCommand command) {
         AccountDetail accountDetail = command.accountDetail();
+        Set<AccountOwnership> accountOwners = Optional.ofNullable(command.personOwnershipMap()).orElse(new HashMap<>())
+                .entrySet()
+                .stream()
+                .collect(HashSet::new, (set, entry) -> set.add(new AccountOwnership(entry.getKey(), entry.getValue())), HashSet::addAll);
         return new Account(accountDetail.accountId(),
                 accountDetail.accountType(),
                 accountDetail.bankName(),
-                accountDetail.taxId(), command.accountOwners());
+                accountDetail.taxId(), accountOwners);
     }
 
     @Override

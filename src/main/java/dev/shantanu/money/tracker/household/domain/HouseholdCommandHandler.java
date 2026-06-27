@@ -16,20 +16,19 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class HouseholdCommandHandler {
+class HouseholdCommandHandler {
     private final HouseholdRepository repository;
     private final PersonCreationPort personCreationPort;
-    private static final Logger LOGGER = LoggerFactory.getLogger(HouseholdCommandHandler .class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HouseholdCommandHandler.class);
 
-    @SuppressWarnings("ClassEscapesDefinedScope")
-    public HouseholdCommandHandler(HouseholdRepository repository,
-                                   PersonCreationPort personCreationPort) {
+    HouseholdCommandHandler(HouseholdRepository repository,
+                            PersonCreationPort personCreationPort) {
         this.repository = repository;
         this.personCreationPort = personCreationPort;
     }
 
     @Transactional
-    public Optional<HouseholdCommands.HouseholdCreatedResult> handleAddMember(AddMembers command) {
+    Optional<HouseholdCommands.HouseholdCreatedResult> handleAddMember(AddMembers command) {
         Optional<Household> householdById = repository.findById(command.householdId().id());
         return householdById.map(household -> {
             Set<Ids.PersonId> personIds = personCreationPort.addMembers(householdById.get().getHouseholdId(), command.personDraftSet());

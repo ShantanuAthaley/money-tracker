@@ -1,6 +1,5 @@
 package dev.shantanu.money.tracker.account.domain;
 
-import dev.shantanu.money.tracker.account.AccountOwnership;
 import dev.shantanu.money.tracker.account.CreateAccountCommand;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +9,7 @@ import java.util.Set;
 
 @Component
 class AccountCommandHandler {
-    AccountRepository repository;
+    private final AccountRepository repository;
 
     public AccountCommandHandler(AccountRepository repository) {
         this.repository = repository;

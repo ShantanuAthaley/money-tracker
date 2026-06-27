@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
-public class PersonService implements PersonCreationPort{
+class PersonService implements PersonCreationPort {
     private final PersonQueryHandler personQueryHandler;
     private final PersonCommandHandler personCommandHandler;
 
@@ -50,7 +50,7 @@ public class PersonService implements PersonCreationPort{
                 .filter(isAlreadyMemberByTaxId.negate())
                 .collect(Collectors.toSet());
 
-        if(newMembers.isEmpty()) {
+        if (newMembers.isEmpty()) {
             LOGGER.warn("Member are already for household ID = {}", householdId);
         }
         return personCommandHandler.createPersonForHousehold(householdId, newMembers);
